@@ -1,0 +1,26 @@
+{
+  "name": "youhavebeenslackingoff",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "tsc index.ts & node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/demo-hub/YouHaveBeenSlackingOff.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/demo-hub/YouHaveBeenSlackingOff/issues"
+  },
+  "homepage": "https://github.com/demo-hub/YouHaveBeenSlackingOff#readme",
+  "dependencies": {
+    "@types/node": "^18.8.3",
+    "axios": "^1.1.0",
+    "bitbucket": "^2.8.0",
+    "dotenv": "^16.0.3"
+  }
+}
