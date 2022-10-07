@@ -26,23 +26,27 @@ auth
           accountsToFilter?.includes(pr.author?.account_id as string)
         );
 
-        if (prs?.[0] && prs?.[0]?.id) {
-          bitbucket.pullrequests
-            .get({
-              pull_request_id: prs[0].id,
-              repo_slug: "replai-platform",
-              workspace: "replai",
-            })
-            .then((response) => {
-              const approvals = response.data.participants?.filter(
-                (p) => p.role === "REVIEWER" && p.approved
-              );
+        if (prs) {
+          for (let pr of prs) {
+            if (pr.id) {
+              bitbucket.pullrequests
+                .get({
+                  pull_request_id: pr.id,
+                  repo_slug: "replai-platform",
+                  workspace: "replai",
+                })
+                .then((response) => {
+                  const approvals = response.data.participants?.filter(
+                    (p) => p.role === "REVIEWER" && p.approved
+                  );
 
-              if (approvals?.length === 0) {
-                // TODO: Send message to Slack
-              }
-            })
-            .catch((error) => console.log(error));
+                  if (approvals?.length === 0) {
+                    // TODO: Send message to Slack
+                  }
+                })
+                .catch((error) => console.log(error));
+            }
+          }
         }
       })
       .catch((error) => {
