@@ -15,8 +15,8 @@ auth
 
     bitbucket.pullrequests
       .list({
-        repo_slug: "replai-platform",
-        workspace: "replai",
+        repo_slug: process.env.REPO_SLUG ?? "",
+        workspace: process.env.WORKSPACE ?? "",
         state: "OPEN",
       })
       .then((response) => {
@@ -32,8 +32,8 @@ auth
               bitbucket.pullrequests
                 .get({
                   pull_request_id: pr.id,
-                  repo_slug: "replai-platform",
-                  workspace: "replai",
+                  repo_slug: process.env.REPO_SLUG ?? "",
+                  workspace: process.env.WORKSPACE ?? "",
                 })
                 .then((response) => {
                   const approvals = response.data.participants?.filter(
