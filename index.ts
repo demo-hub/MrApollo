@@ -3,6 +3,8 @@ import * as dotenv from "dotenv";
 import auth from "./authentication/authentication";
 dotenv.config();
 
+const MS_IN_AN_HOUR = 3600000;
+
 auth
   .then((token) => {
     const clientOptions = {
@@ -28,7 +30,14 @@ auth
 
         if (prs) {
           for (let pr of prs) {
-            if (pr.id) {
+            // calculate numbers of hours between PR creation and last update
+            const dateDiffInMs =
+              new Date(pr.updated_on ?? "").getTime() -
+              new Date(pr.created_on ?? "").getTime();
+
+            const dateDiffInHours = dateDiffInMs / MS_IN_AN_HOUR;
+
+            if (pr.id && dateDiffInHours >= 24) {
               bitbucket.pullrequests
                 .get({
                   pull_request_id: pr.id,
