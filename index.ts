@@ -25,7 +25,9 @@ auth
         const accountsToFilter = process.env.ACCOUNT_IDS?.split(",");
 
         const prs = response.data.values?.filter((pr) =>
-          accountsToFilter?.includes(pr.author?.account_id as string)
+          accountsToFilter
+            ? accountsToFilter.includes(pr.author?.account_id as string)
+            : true
         );
 
         if (prs) {
