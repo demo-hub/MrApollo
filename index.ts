@@ -32,10 +32,9 @@ auth
 
         if (prs) {
           for (let pr of prs) {
-            // calculate numbers of hours between PR creation and last update
+            // calculate numbers of hours since the last update
             const dateDiffInMs =
-              new Date(pr.updated_on ?? "").getTime() -
-              new Date(pr.created_on ?? "").getTime();
+              new Date(pr.updated_on ?? "").getTime() - new Date().getTime();
 
             const dateDiffInHours = dateDiffInMs / MS_IN_AN_HOUR;
 
