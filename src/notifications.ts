@@ -2,54 +2,60 @@ import { APIClient } from "bitbucket";
 
 const MS_IN_AN_HOUR = 3600000;
 
-const notifyPRsOpen = (bitbucket: APIClient) => {
-  bitbucket.pullrequests
-    .list({
-      repo_slug: process.env.REPO_SLUG ?? "",
-      workspace: process.env.WORKSPACE ?? "",
-      state: "OPEN",
-    })
-    .then((response) => {
-      const accountsToFilter = process.env.ACCOUNT_IDS?.split(",");
+const notifyPRsOpen = async (bitbucket: APIClient) => {
+  const pullRequests = await bitbucket.pullrequests.list({
+    repo_slug: process.env.REPO_SLUG ?? "",
+    workspace: process.env.WORKSPACE ?? "",
+    state: "OPEN",
+  });
 
-      const prs = response.data.values?.filter((pr) =>
-        accountsToFilter
-          ? accountsToFilter.includes(pr.author?.account_id as string)
-          : true
-      );
+  const accountsToFilter = process.env.ACCOUNT_IDS?.split(",");
 
-      if (prs) {
-        for (let pr of prs) {
-          // calculate numbers of hours since the last update
-          const dateDiffInMs =
-            new Date(pr.updated_on ?? "").getTime() - new Date().getTime();
+  const prs = pullRequests.data.values?.filter((pr) =>
+    accountsToFilter
+      ? accountsToFilter.includes(pr.author?.account_id as string)
+      : true
+  );
 
-          const dateDiffInHours = dateDiffInMs / MS_IN_AN_HOUR;
+  if (prs) {
+    let prsToNotify: any[] = [];
 
-          if (pr.id && dateDiffInHours >= 24) {
-            bitbucket.pullrequests
-              .get({
-                pull_request_id: pr.id,
-                repo_slug: process.env.REPO_SLUG ?? "",
-                workspace: process.env.WORKSPACE ?? "",
-              })
-              .then((response) => {
-                const approvals = response.data.participants?.filter(
-                  (p) => p.role === "REVIEWER" && p.approved
-                );
+    for (const pr of prs) {
+      // calculate numbers of hours since the last update
+      const dateDiffInMs =
+        new Date(pr.updated_on ?? "").getTime() - new Date().getTime();
 
-                if (approvals?.length === 0) {
-                  // TODO: Send message to Slack
-                }
-              })
-              .catch((error) => console.log(error));
-          }
+      const dateDiffInHours = dateDiffInMs / MS_IN_AN_HOUR;
+
+      if (
+        process.env.TIME_TO_NOTIFY_PR_IN_H &&
+        pr.id &&
+        dateDiffInHours >= parseInt(process.env.TIME_TO_NOTIFY_PR_IN_H)
+      ) {
+        const pullRequest = await bitbucket.pullrequests.get({
+          pull_request_id: pr.id,
+          repo_slug: process.env.REPO_SLUG ?? "",
+          workspace: process.env.WORKSPACE ?? "",
+        });
+
+        const approvals = pullRequest.data.participants?.filter(
+          (p) => p.role === "REVIEWER" && p.approved
+        );
+
+        if (
+          pullRequest.data.participants &&
+          pullRequest.data.participants?.length > 0 &&
+          approvals?.length === 0
+        ) {
+          prsToNotify.push(pr);
         }
       }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    }
+
+    return prsToNotify;
+  }
+
+  return [];
 };
 
 export default notifyPRsOpen;
