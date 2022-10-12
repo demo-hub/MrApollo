@@ -2,7 +2,7 @@ import { WebClient } from "@slack/web-api";
 import { Bitbucket } from "bitbucket";
 import * as dotenv from "dotenv";
 import auth from "./authentication";
-import notifyPRsOpen from "./notifications";
+import { notifyPRsOpen, notifyPRsWithConflicts } from "./notifications";
 
 // load env variables
 dotenv.config();
@@ -34,6 +34,8 @@ auth
         link_names: true,
       });
     }
+
+    await notifyPRsWithConflicts(bitbucket);
   })
   .catch((error) => {
     throw new Error(error);

@@ -2,7 +2,7 @@ import { APIClient } from "bitbucket";
 
 const MS_IN_AN_HOUR = 3600000;
 
-const notifyPRsOpen = async (bitbucket: APIClient) => {
+export const notifyPRsOpen = async (bitbucket: APIClient) => {
   const pullRequests = await bitbucket.pullrequests.list({
     repo_slug: process.env.REPO_SLUG ?? "",
     workspace: process.env.WORKSPACE ?? "",
@@ -58,4 +58,37 @@ const notifyPRsOpen = async (bitbucket: APIClient) => {
   return [];
 };
 
-export default notifyPRsOpen;
+export const notifyPRsWithConflicts = async (bitbucket: APIClient) => {
+  const pullRequests = await bitbucket.pullrequests.list({
+    repo_slug: process.env.REPO_SLUG ?? "",
+    workspace: process.env.WORKSPACE ?? "",
+    state: "OPEN",
+    pagelen: 20,
+  });
+
+  const accountsToFilter = process.env.ACCOUNT_IDS?.split(",");
+
+  const prs = pullRequests.data.values?.filter((pr) =>
+    accountsToFilter
+      ? accountsToFilter.includes(pr.author?.account_id as string)
+      : true
+  );
+
+  if (prs) {
+    let prsToNotify: any[] = [];
+
+    for (const pr of prs.slice(8, 9)) {
+      if (pr.id) {
+        const pullRequest = await bitbucket.pullrequests.getDiffStat({
+          pull_request_id: pr.id,
+          repo_slug: process.env.REPO_SLUG ?? "",
+          workspace: process.env.WORKSPACE ?? "",
+        });
+      }
+    }
+
+    return prsToNotify;
+  }
+
+  return [];
+};
