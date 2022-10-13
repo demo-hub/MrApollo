@@ -34,3 +34,9 @@ It's recommended to [create a new, empty public channel](https://slack.com/help/
 **SLACK_CHANNEL_ID**: Slack channel ID
 
 **SLACK_USER_TO_TAG**: Slack handle of the user/group to tag in messages
+
+**MESSAGES_INTERVAL_IN_MS**: Interval in milliseconds between messages
+
+**WORKING_HOURS_START**: Working start hour time in 24h format
+
+**WORKING_HOURS_END**: Working end hour time in 24h format
