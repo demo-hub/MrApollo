@@ -51,5 +51,5 @@ setInterval(
   },
   process.env.MESSAGES_INTERVAL_IN_MS
     ? parseInt(process.env.MESSAGES_INTERVAL_IN_MS)
-    : 100 // 10 seconds
+    : 10000 // 10 seconds
 );
