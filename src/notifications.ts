@@ -7,6 +7,7 @@ export const notifyPRsOpen = async (bitbucket: APIClient) => {
     repo_slug: process.env.REPO_SLUG ?? "",
     workspace: process.env.WORKSPACE ?? "",
     state: "OPEN",
+    pagelen: 20,
   });
 
   const accountsToFilter = process.env.ACCOUNT_IDS?.split(",");
@@ -17,13 +18,15 @@ export const notifyPRsOpen = async (bitbucket: APIClient) => {
       : true
   );
 
+  console.log(prs?.map((p) => p.title));
+
   if (prs) {
     let prsToNotify: any[] = [];
 
     for (const pr of prs) {
       // calculate numbers of hours since the last update
       const dateDiffInMs =
-        new Date(pr.updated_on ?? "").getTime() - new Date().getTime();
+        new Date().getTime() - new Date(pr.updated_on ?? "").getTime();
 
       const dateDiffInHours = dateDiffInMs / MS_IN_AN_HOUR;
 
