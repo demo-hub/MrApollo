@@ -30,7 +30,7 @@ auth
 
       await slack.chat.postMessage({
         channel: process.env.SLACK_CHANNEL_ID ?? "",
-        text: `@${process.env.SLACK_USER_TO_TAG} there are some PRs waiting for your review: ${formattedPRLinks}`,
+        text: `@${process.env.SLACK_USER_TO_TAG} some PRs are waiting for your review: ${formattedPRLinks}`,
         link_names: true,
       });
     }

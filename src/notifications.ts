@@ -18,8 +18,6 @@ export const notifyPRsOpen = async (bitbucket: APIClient) => {
       : true
   );
 
-  console.log(prs?.map((p) => p.title));
-
   if (prs) {
     let prsToNotify: any[] = [];
 
