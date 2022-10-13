@@ -7,36 +7,49 @@ import { notifyPRsOpen, notifyPRsWithConflicts } from "./notifications";
 // load env variables
 dotenv.config();
 
-auth
-  .then(async (token) => {
-    const clientOptions = {
-      auth: {
-        token: token.data.access_token ?? "",
-      },
-    };
+setTimeout(
+  async () => {
+    const currentDate = new Date();
 
-    const bitbucket = new Bitbucket(clientOptions);
+    if (
+      currentDate.getHours() >=
+        parseInt(process.env.WORKING_HOURS_START ?? "8") &&
+      currentDate.getHours() <= parseInt(process.env.WORKING_HOURS_END ?? "18")
+    ) {
+      const token = await auth();
 
-    const prs = await notifyPRsOpen(bitbucket);
+      const clientOptions = {
+        auth: {
+          token: token.data.access_token ?? "",
+        },
+      };
 
-    if (process.env.SLACK_TOKEN && prs.length > 0) {
-      // Read Slack token from the environment variables
-      const slackToken = process.env.SLACK_TOKEN;
+      const bitbucket = new Bitbucket(clientOptions);
 
-      // Initialize Slack client
-      const slack = new WebClient(slackToken);
+      const prs = await notifyPRsOpen(bitbucket);
 
-      const formattedPRLinks = prs.map((pr) => pr.links?.html?.href).join("\n");
+      if (process.env.SLACK_TOKEN && prs.length > 0) {
+        // Read Slack token from the environment variables
+        const slackToken = process.env.SLACK_TOKEN;
 
-      await slack.chat.postMessage({
-        channel: process.env.SLACK_CHANNEL_ID ?? "",
-        text: `@${process.env.SLACK_USER_TO_TAG} some PRs are waiting for your review: ${formattedPRLinks}`,
-        link_names: true,
-      });
+        // Initialize Slack client
+        const slack = new WebClient(slackToken);
+
+        const formattedPRLinks = prs
+          .map((pr) => pr.links?.html?.href)
+          .join("\n");
+
+        await slack.chat.postMessage({
+          channel: process.env.SLACK_CHANNEL_ID ?? "",
+          text: `@${process.env.SLACK_USER_TO_TAG} some PRs are waiting for your review: ${formattedPRLinks}`,
+          link_names: true,
+        });
+      }
+
+      await notifyPRsWithConflicts(bitbucket);
     }
-
-    await notifyPRsWithConflicts(bitbucket);
-  })
-  .catch((error) => {
-    throw new Error(error);
-  });
+  },
+  process.env.MESSAGES_INTERVAL_IN_MS
+    ? parseInt(process.env.MESSAGES_INTERVAL_IN_MS)
+    : 10000 // 10 seconds
+);
