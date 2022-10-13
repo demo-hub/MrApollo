@@ -7,7 +7,7 @@ import { notifyPRsOpen, notifyPRsWithConflicts } from "./notifications";
 // load env variables
 dotenv.config();
 
-setTimeout(
+setInterval(
   async () => {
     const currentDate = new Date();
 
@@ -51,5 +51,5 @@ setTimeout(
   },
   process.env.MESSAGES_INTERVAL_IN_MS
     ? parseInt(process.env.MESSAGES_INTERVAL_IN_MS)
-    : 10000 // 10 seconds
+    : 100 // 10 seconds
 );
