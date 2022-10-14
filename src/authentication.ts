@@ -1,6 +1,4 @@
 import axios from "axios";
-import * as dotenv from "dotenv";
-dotenv.config();
 
 const auth = () =>
   axios.post<{ access_token: string }>(
