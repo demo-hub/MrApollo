@@ -39,6 +39,7 @@ setInterval(
         await Slack.sendPRMessage(prs);
       }
 
+      // TODO: notify on PRs with merge conflicts
       await BitbucketIntegration.getPRsWithConflicts(bitbucket);
 
       await JIRA.addCommentToInactiveIssues();
