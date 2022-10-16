@@ -1,9 +1,9 @@
-import { WebClient } from "@slack/web-api";
 import { Bitbucket } from "bitbucket";
 import * as dotenv from "dotenv";
-import auth from "./authentication";
-import { getPRsOpen, getPRsWithConflicts } from "./bitbucket";
-import addCommentToInactiveIssues from "./jira";
+import auth from "./bitbucket/authentication";
+import { getPRsOpen, getPRsWithConflicts } from "./bitbucket/bitbucket";
+import addCommentToInactiveIssues from "./jira/jira";
+import sendPRMessage from "./slack/slack";
 
 // load env variables
 dotenv.config();
@@ -30,21 +30,7 @@ setInterval(
       const prs = await getPRsOpen(bitbucket);
 
       if (process.env.SLACK_TOKEN && prs.length > 0) {
-        // Read Slack token from the environment variables
-        const slackToken = process.env.SLACK_TOKEN;
-
-        // Initialize Slack client
-        const slack = new WebClient(slackToken);
-
-        const formattedPRLinks = prs
-          .map((pr) => pr.links?.html?.href)
-          .join("\n");
-
-        await slack.chat.postMessage({
-          channel: process.env.SLACK_CHANNEL_ID ?? "",
-          text: `@${process.env.SLACK_USER_TO_TAG} some PRs are waiting for your review: ${formattedPRLinks}`,
-          link_names: true,
-        });
+        await sendPRMessage(prs);
       }
 
       await getPRsWithConflicts(bitbucket);
@@ -54,5 +40,5 @@ setInterval(
   },
   process.env.MESSAGES_INTERVAL_IN_MS
     ? parseInt(process.env.MESSAGES_INTERVAL_IN_MS)
-    : 100 // 10 seconds
+    : 10000 // 10 seconds
 );
