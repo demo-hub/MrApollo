@@ -25,15 +25,30 @@ setInterval(
     });
 
     const jiraIssues = await client.issueSearch.searchForIssuesUsingJql({
-      jql: `project = ${process.env.JIRA_TARGET_PROJECT} AND issuetype in (Story, Task) AND status = "Backlog"`,
+      jql: `project = ${process.env.JIRA_TARGET_PROJECT} AND issuetype in (Story, Task) AND status = "Backlog" ORDER BY created ASC`,
     });
 
     for (const issue of jiraIssues.issues ?? []) {
       const issueDetails = await client.issues.getIssue({
         issueIdOrKey: issue.key,
+        expand: ["changelog"],
       });
 
-      const issueUpdatedDate = new Date(issueDetails.fields.updated);
+      // Issue updated date excluded "Fix Version/s" updates
+      const realUpdatedDate = issueDetails.changelog?.histories
+        ?.map((history) => ({
+          items: history.items,
+          created: history.created,
+        }))
+        .filter((i) =>
+          i.items?.some(
+            (item) => item.field !== "Fix Version" && item.field !== "Version"
+          )
+        )?.[0]?.created;
+
+      const issueUpdatedDate = new Date(
+        realUpdatedDate ?? issue.fields.updated
+      );
 
       const dateDiffInMs = currentDate.getTime() - issueUpdatedDate.getTime();
 
