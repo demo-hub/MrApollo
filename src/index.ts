@@ -8,6 +8,9 @@ import * as Slack from "./slack/slack";
 // load env variables
 dotenv.config();
 
+const SUNDAY = 0;
+const SATURDAY = 6;
+
 setInterval(
   async () => {
     const currentDate = new Date();
@@ -15,7 +18,10 @@ setInterval(
     if (
       currentDate.getHours() >=
         parseInt(process.env.WORKING_HOURS_START ?? "8") &&
-      currentDate.getHours() <= parseInt(process.env.WORKING_HOURS_END ?? "18")
+      currentDate.getHours() <=
+        parseInt(process.env.WORKING_HOURS_END ?? "18") &&
+      currentDate.getDay() !== SUNDAY &&
+      currentDate.getDay() !== SATURDAY
     ) {
       const token = await auth();
 
