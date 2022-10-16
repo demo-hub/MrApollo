@@ -5,6 +5,10 @@
 
 - Notifies Slack channel/user/group if a PR is without activity for at least X hours
 
+### JIRA
+
+- Adds comment to JIRA ticket if it is without activity for at least X days
+
 ## Development
 
 ### Bitbucket
@@ -40,3 +44,13 @@ It's recommended to [create a new, empty public channel](https://slack.com/help/
 **WORKING_HOURS_START**: Working start hour time in 24h format
 
 **WORKING_HOURS_END**: Working end hour time in 24h format
+
+**JIRA_API_TOKEN**: JIRA API Token for authentication
+
+**JIRA_HOST**: JIRA Host
+
+**JIRA_EMAIL**: JIRA Email for authentication
+
+**JIRA_TARGET_PROJECT**: JIRA Project Key
+
+**TIME_TO_NOTIFY_ISSUE_IN_DAYS**: Time in days an issue needs to be without activity to trigger notifications
