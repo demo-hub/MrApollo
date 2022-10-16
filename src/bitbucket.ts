@@ -2,7 +2,7 @@ import { APIClient } from "bitbucket";
 
 const MS_IN_AN_HOUR = 3600000;
 
-export const notifyPRsOpen = async (bitbucket: APIClient) => {
+export const getPRsOpen = async (bitbucket: APIClient) => {
   const pullRequests = await bitbucket.pullrequests.list({
     repo_slug: process.env.REPO_SLUG ?? "",
     workspace: process.env.WORKSPACE ?? "",
@@ -59,7 +59,7 @@ export const notifyPRsOpen = async (bitbucket: APIClient) => {
   return [];
 };
 
-export const notifyPRsWithConflicts = async (bitbucket: APIClient) => {
+export const getPRsWithConflicts = async (bitbucket: APIClient) => {
   const pullRequests = await bitbucket.pullrequests.list({
     repo_slug: process.env.REPO_SLUG ?? "",
     workspace: process.env.WORKSPACE ?? "",
