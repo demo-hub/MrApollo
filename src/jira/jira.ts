@@ -2,7 +2,7 @@ import { Version3Client } from "jira.js";
 
 const MS_IN_A_DAY = 86400000;
 
-const addCommentToInactiveIssues = async () => {
+export const addCommentToInactiveIssues = async () => {
   const currentDate = new Date();
 
   const client = new Version3Client({
@@ -58,5 +58,3 @@ const addCommentToInactiveIssues = async () => {
     }
   }
 };
-
-export default addCommentToInactiveIssues;

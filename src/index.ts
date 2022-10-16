@@ -1,9 +1,9 @@
 import { Bitbucket } from "bitbucket";
 import * as dotenv from "dotenv";
 import auth from "./bitbucket/authentication";
-import { getPRsOpen, getPRsWithConflicts } from "./bitbucket/bitbucket";
-import addCommentToInactiveIssues from "./jira/jira";
-import sendPRMessage from "./slack/slack";
+import * as BitbucketIntegration from "./bitbucket/bitbucket";
+import * as JIRA from "./jira/jira";
+import * as Slack from "./slack/slack";
 
 // load env variables
 dotenv.config();
@@ -27,15 +27,15 @@ setInterval(
 
       const bitbucket = new Bitbucket(clientOptions);
 
-      const prs = await getPRsOpen(bitbucket);
+      const prs = await BitbucketIntegration.getPRsOpen(bitbucket);
 
       if (process.env.SLACK_TOKEN && prs.length > 0) {
-        await sendPRMessage(prs);
+        await Slack.sendPRMessage(prs);
       }
 
-      await getPRsWithConflicts(bitbucket);
+      await BitbucketIntegration.getPRsWithConflicts(bitbucket);
 
-      await addCommentToInactiveIssues();
+      await JIRA.addCommentToInactiveIssues();
     }
   },
   process.env.MESSAGES_INTERVAL_IN_MS

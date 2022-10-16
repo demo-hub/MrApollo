@@ -1,6 +1,6 @@
 import { WebClient } from "@slack/web-api";
 
-const sendPRMessage = async (prs: any[]) => {
+export const sendPRMessage = async (prs: any[]) => {
   // Read Slack token from the environment variables
   const slackToken = process.env.SLACK_TOKEN;
 
@@ -15,5 +15,3 @@ const sendPRMessage = async (prs: any[]) => {
     link_names: true,
   });
 };
-
-export default sendPRMessage;
